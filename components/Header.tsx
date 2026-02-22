@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { NAV_LINKS, SITE_CONFIG } from "@/lib/constants";
@@ -14,6 +15,27 @@ export default function Header() {
     const [scrolled, setScrolled] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const params = useParams();
+    const router = useRouter();
+    const pathname = usePathname();
+    const currentLang = (params?.lang as string) === "hi" ? "hi" : "en";
+
+    const toggleLang = () => {
+        const newLang = currentLang === "en" ? "hi" : "en";
+        localStorage.setItem("language", newLang);
+        if (pathname) {
+            const segments = pathname.split('/').filter(Boolean);
+            if (segments[0] === "en" || segments[0] === "hi") {
+                segments[0] = newLang;
+            } else {
+                segments.unshift(newLang);
+            }
+            router.push(`/${segments.join('/')}`);
+        } else {
+            router.push(`/${newLang}`);
+        }
+    };
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -93,7 +115,7 @@ export default function Header() {
                 }`}
         >
             <div className="container-docs flex items-center justify-between h-16">
-                <Link href="/" className="flex items-center gap-2.5 group">
+                <Link href={`/${currentLang}`} className="flex items-center gap-2.5 group">
                     <Image
                         src="/brokenn-shell.svg"
                         alt={`${SITE_CONFIG.name} Logo`}
@@ -107,11 +129,14 @@ export default function Header() {
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-1">
-                    {NAV_LINKS.map((link) =>
-                        "external" in link && link.external ? (
+                    {NAV_LINKS.map((link) => {
+                        const isExternal = "external" in link && link.external;
+                        const href = isExternal ? link.href : link.href === "/" ? `/${currentLang}` : link.href.startsWith("/#") ? `/${currentLang}${link.href.slice(1)}` : `/${currentLang}${link.href}`;
+
+                        return isExternal ? (
                             <a
                                 key={link.label}
-                                href={link.href}
+                                href={href}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="px-3.5 py-2 text-sm text-text-secondary hover:text-text-primary rounded-lg hover:bg-bg-tertiary/50 transition-colors"
@@ -121,16 +146,23 @@ export default function Header() {
                         ) : (
                             <Link
                                 key={link.label}
-                                href={link.href}
+                                href={href}
                                 className="px-3.5 py-2 text-sm text-text-secondary hover:text-text-primary rounded-lg hover:bg-bg-tertiary/50 transition-colors"
                             >
                                 {link.label}
                             </Link>
-                        )
-                    )}
+                        );
+                    })}
                 </nav>
 
                 <div className="flex items-center gap-3">
+                    <button
+                        onClick={toggleLang}
+                        className="px-2 py-1 text-xs font-semibold rounded border border-border-secondary text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors"
+                        title="Toggle Language (English/Hinglish)"
+                    >
+                        {currentLang === "en" ? "EN" : "HI"}
+                    </button>
                     {/* Global Search Button */}
                     <button
                         onClick={() => setSearchOpen(true)}
@@ -198,11 +230,14 @@ export default function Header() {
                 ref={mobileMenuRef}
                 className="md:hidden absolute top-16 left-0 right-0 bg-bg-primary/95 backdrop-blur-xl border-b border-border-secondary hidden flex-col w-full px-4 py-4 gap-2 shadow-2xl h-[calc(100vh-64px)] overflow-y-auto"
             >
-                {NAV_LINKS.map((link) =>
-                    "external" in link && link.external ? (
+                {NAV_LINKS.map((link) => {
+                    const isExternal = "external" in link && link.external;
+                    const href = isExternal ? link.href : link.href === "/" ? `/${currentLang}` : link.href.startsWith("/#") ? `/${currentLang}${link.href.slice(1)}` : `/${currentLang}${link.href}`;
+
+                    return isExternal ? (
                         <a
                             key={link.label}
-                            href={link.href}
+                            href={href}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-lg font-medium text-text-secondary hover:text-text-primary py-3 border-b border-border-secondary/50"
@@ -213,14 +248,14 @@ export default function Header() {
                     ) : (
                         <Link
                             key={link.label}
-                            href={link.href}
+                            href={href}
                             className="text-lg font-medium text-text-secondary hover:text-text-primary py-3 border-b border-border-secondary/50"
                             onClick={() => setMobileMenuOpen(false)}
                         >
                             {link.label}
                         </Link>
-                    )
-                )}
+                    );
+                })}
             </div>
 
             <SearchOverlay

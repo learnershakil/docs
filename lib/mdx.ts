@@ -14,9 +14,11 @@ export interface MDXNote {
 
 export async function getNoteContent(
     domainSlug: string,
-    noteSlug: string
+    noteSlug: string,
+    lang: string = "en"
 ): Promise<MDXNote | null> {
-    const fullPath = path.join(contentDirectory, domainSlug, `${noteSlug}.mdx`);
+    const langFolder = lang === "hi" ? "hinglish" : "english";
+    const fullPath = path.join(contentDirectory, langFolder, domainSlug, `${noteSlug}.mdx`);
 
     if (!fs.existsSync(fullPath)) {
         return null;

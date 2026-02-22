@@ -4,18 +4,19 @@ import type { Domain, NoteMetadata } from "@/types";
 interface BreadcrumbsProps {
     domain: Domain;
     note: NoteMetadata;
+    lang: string;
 }
 
-export default function Breadcrumbs({ domain, note }: BreadcrumbsProps) {
+export default function Breadcrumbs({ domain, note, lang }: BreadcrumbsProps) {
     return (
         <nav aria-label="Breadcrumb" className="mb-8">
             <ol className="flex items-center space-x-2 text-sm text-text-tertiary">
                 <li>
                     <Link
-                        href="/"
+                        href={`/${lang}`}
                         className="hover:text-text-primary transition-colors"
                     >
-                        Home
+                        {lang === "hi" ? "Mukhya (Home)" : "Home"}
                     </Link>
                 </li>
                 <li className="flex items-center space-x-2">
@@ -23,7 +24,7 @@ export default function Breadcrumbs({ domain, note }: BreadcrumbsProps) {
                         <polyline points="9 18 15 12 9 6" />
                     </svg>
                     <Link
-                        href={`/${domain.slug}`}
+                        href={`/${lang}/${domain.slug}`}
                         className="hover:text-text-primary transition-colors"
                     >
                         {domain.title}

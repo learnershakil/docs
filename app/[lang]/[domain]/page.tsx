@@ -13,20 +13,27 @@ import type { NoteSidebarItem } from "@/types";
 
 interface PageProps {
     params: Promise<{
+        lang: string;
         domain: string;
     }>;
 }
 
 export async function generateStaticParams() {
     const slugs = getAllDomainSlugs();
-    return slugs.map((slug) => ({
-        domain: slug,
-    }));
+    const params: { lang: string; domain: string; }[] = [];
+    for (const lang of ["en", "hi"]) {
+        for (const slug of slugs) {
+            params.push({ lang, domain: slug });
+        }
+    }
+    return params;
 }
 
+export const dynamicParams = false;
+
 export async function generateMetadata({ params }: PageProps) {
-    const { domain: domainSlug } = await params;
-    const domainData = getDomainBySlug(domainSlug);
+    const { lang, domain: domainSlug } = await params;
+    const domainData = getDomainBySlug(domainSlug, lang as "en" | "hi");
 
     if (!domainData) {
         return {
@@ -41,16 +48,17 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 export default async function DomainHubPage({ params }: PageProps) {
-    const { domain: domainSlug } = await params;
-    const domainData = getDomainBySlug(domainSlug);
+    const { lang, domain: domainSlug } = await params;
+    const currentLang = lang as "en" | "hi";
+    const domainData = getDomainBySlug(domainSlug, currentLang);
 
     if (!domainData) {
         notFound();
     }
 
-    const roadmap = getRoadmapByDomain(domainSlug);
-    const rawNotes = getNotesByDomain(domainSlug);
-    const topics = getTopicsByDomain(domainSlug);
+    const roadmap = getRoadmapByDomain(domainSlug, currentLang);
+    const rawNotes = getNotesByDomain(domainSlug, currentLang);
+    const topics = getTopicsByDomain(domainSlug, currentLang);
 
     // Group notes into tree structure for the sidebar
     const notesTree: NoteSidebarItem[] = topics.map((topic) => ({

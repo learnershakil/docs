@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import type { Domain } from "@/types";
@@ -13,6 +14,8 @@ interface DomainCardProps {
 
 export default function DomainCard({ domain, index }: DomainCardProps) {
     const cardRef = useRef<HTMLAnchorElement>(null);
+    const params = useParams();
+    const currentLang = (params?.lang as string) === "hi" ? "hi" : "en";
 
     useGSAP(() => {
         gsap.fromTo(
@@ -31,7 +34,7 @@ export default function DomainCard({ domain, index }: DomainCardProps) {
     return (
         <Link
             ref={cardRef}
-            href={`/${domain.slug}`}
+            href={`/${currentLang}/${domain.slug}`}
             className="card group p-6 flex flex-col gap-4 opacity-0"
         >
             <div className="flex items-start justify-between">

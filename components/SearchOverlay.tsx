@@ -2,10 +2,9 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { gsap } from "gsap";
-import { domains } from "@/lib/data/domains";
-import { roadmaps } from "@/lib/data/roadmaps";
-import { notesMeta } from "@/lib/data/notes";
+import { getDomains, getRoadmapByDomain, getNotesByDomain } from "@/lib/data";
 import type { SearchResult } from "@/types";
 
 interface SearchOverlayProps {
@@ -23,12 +22,16 @@ export default function SearchOverlay({
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
+    const params = useParams();
+    const currentLang = (params?.lang as string) === "hi" ? "hi" : "en";
+    const localizedDomains = useMemo(() => getDomains(currentLang), [currentLang]);
+
     // Generate searchable index (static computation)
     const searchIndex = useMemo(() => {
         const index: SearchResult[] = [];
 
         // Add domains
-        domains.forEach((d) => {
+        localizedDomains.forEach((d) => {
             index.push({
                 type: "domain",
                 title: d.title,
@@ -37,38 +40,36 @@ export default function SearchOverlay({
                 domainSlug: d.slug,
                 domainTitle: d.title,
             });
-        });
 
-        // Add roadmaps
-        Object.values(roadmaps).forEach((r) => {
-            const parentDomain = domains.find((d) => d.slug === r.domainSlug)!;
-            index.push({
-                type: "roadmap",
-                title: r.title,
-                description: r.description,
-                slug: "", // Roadmaps are on the domain hub page
-                domainSlug: r.domainSlug,
-                domainTitle: parentDomain.title,
-            });
-        });
+            // Add roadmaps
+            const r = getRoadmapByDomain(d.slug, currentLang);
+            if (r) {
+                index.push({
+                    type: "roadmap",
+                    title: r.title,
+                    description: r.description,
+                    slug: "", // Roadmaps are on the domain hub page
+                    domainSlug: r.domainSlug,
+                    domainTitle: d.title,
+                });
+            }
 
-        // Add notes
-        Object.values(notesMeta).flat().forEach((n) => {
-            const parentDomain = domains.find((d) => d.slug === n.domainSlug);
-            if (parentDomain) {
+            // Add notes
+            const notes = getNotesByDomain(d.slug, currentLang);
+            notes.forEach((n) => {
                 index.push({
                     type: "note",
                     title: n.title,
                     description: n.description,
                     slug: n.slug,
                     domainSlug: n.domainSlug,
-                    domainTitle: parentDomain.title,
+                    domainTitle: d.title,
                 });
-            }
+            });
         });
 
         return index;
-    }, []);
+    }, [localizedDomains, currentLang]);
 
     // Perform search
     const results = useMemo(() => {
@@ -189,7 +190,7 @@ export default function SearchOverlay({
                     >
                         All
                     </button>
-                    {domains.map((d) => (
+                    {localizedDomains.map((d) => (
                         <button
                             key={d.id}
                             onClick={() => setActiveFilter(d.slug)}
@@ -218,7 +219,7 @@ export default function SearchOverlay({
                             {results.map((result, i) => (
                                 <li key={`${result.domainSlug}-${result.slug}-${i}`}>
                                     <Link
-                                        href={`/${result.domainSlug}${result.type === "note" ? `/notes/${result.slug}` : ""}`}
+                                        href={`/${currentLang}/${result.domainSlug}${result.type === "note" ? `/notes/${result.slug}` : ""}`}
                                         onClick={onClose}
                                         className="flex flex-col md:flex-row md:items-center justify-between gap-2 p-3 rounded-xl hover:bg-bg-tertiary transition-colors group"
                                     >
@@ -238,7 +239,7 @@ export default function SearchOverlay({
 
                                         <div className="shrink-0 flex items-center justify-start md:justify-end">
                                             <span className="text-xs font-medium text-text-tertiary flex items-center gap-1.5">
-                                                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: domains.find(d => d.slug === result.domainSlug)?.color }} />
+                                                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: localizedDomains.find(d => d.slug === result.domainSlug)?.color }} />
                                                 {result.domainTitle}
                                             </span>
                                         </div>

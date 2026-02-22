@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useParams } from "next/navigation";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import Link from "next/link";
@@ -17,6 +18,8 @@ export default function DomainTabs({ domainSlug, roadmap, notes }: DomainTabsPro
     const [activeTab, setActiveTab] = useState<"roadmaps" | "notes">("roadmaps");
     const indicatorRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const params = useParams();
+    const currentLang = (params?.lang as string) === "hi" ? "hi" : "en";
 
     // Animate the active tab indicator
     useGSAP(() => {
@@ -66,7 +69,7 @@ export default function DomainTabs({ domainSlug, roadmap, notes }: DomainTabsPro
                         className={`relative z-10 px-8 py-2.5 text-sm font-medium rounded-lg transition-colors duration-200 ${activeTab === "roadmaps" ? "text-text-primary" : "text-text-tertiary hover:text-text-secondary"
                             }`}
                     >
-                        Roadmaps
+                        {currentLang === "hi" ? "Roadmaps" : "Roadmaps"}
                     </button>
 
                     <button
@@ -74,7 +77,7 @@ export default function DomainTabs({ domainSlug, roadmap, notes }: DomainTabsPro
                         className={`relative z-10 px-8 py-2.5 text-sm font-medium rounded-lg transition-colors duration-200 ${activeTab === "notes" ? "text-text-primary" : "text-text-tertiary hover:text-text-secondary"
                             }`}
                     >
-                        Notes
+                        {currentLang === "hi" ? "Notes" : "Notes"}
                     </button>
                 </div>
             </div>
@@ -100,7 +103,7 @@ export default function DomainTabs({ domainSlug, roadmap, notes }: DomainTabsPro
                                         {group.notes.map((note) => (
                                             <Link
                                                 key={note.slug}
-                                                href={`/${domainSlug}/notes/${note.slug}`}
+                                                href={`/${currentLang}/${domainSlug}/notes/${note.slug}`}
                                                 className="card p-5 group hover:-translate-y-1 transition-transform"
                                             >
                                                 <h4 className="font-semibold text-text-primary group-hover:text-accent-primary transition-colors mb-2">

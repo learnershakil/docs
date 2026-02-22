@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import type { NoteSidebarItem } from "@/types";
 
 interface NotesSidebarProps {
@@ -11,6 +11,8 @@ interface NotesSidebarProps {
 
 export default function NotesSidebar({ domainSlug, items }: NotesSidebarProps) {
     const pathname = usePathname();
+    const params = useParams();
+    const currentLang = (params?.lang as string) === "hi" ? "hi" : "en";
 
     return (
         <aside className="w-full lg:w-64 shrink-0 py-6 lg:py-8 lg:pr-8 border-b border-border-secondary lg:border-none mb-8 lg:mb-0">
@@ -22,7 +24,7 @@ export default function NotesSidebar({ domainSlug, items }: NotesSidebarProps) {
                         </h4>
                         <ul className="space-y-1.5 border-l border-border-secondary ml-1">
                             {group.notes.map((note) => {
-                                const href = `/${domainSlug}/notes/${note.slug}`;
+                                const href = `/${currentLang}/${domainSlug}/notes/${note.slug}`;
                                 const isActive = pathname === href;
 
                                 return (

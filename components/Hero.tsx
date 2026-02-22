@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useParams } from "next/navigation";
 import { gsap } from "gsap";
 import SearchBar from "@/components/SearchBar";
 
@@ -10,6 +11,8 @@ export default function Hero() {
     const subtitleRef = useRef<HTMLParagraphElement>(null);
     const searchRef = useRef<HTMLDivElement>(null);
     const decorRef = useRef<HTMLDivElement>(null);
+    const params = useParams();
+    const currentLang = (params?.lang as string) === "hi" ? "hi" : "en";
 
     useEffect(() => {
         if (!heroRef.current) return;
@@ -47,28 +50,29 @@ export default function Hero() {
             className="relative min-h-[85vh] flex items-center justify-center overflow-hidden"
         >
             <div ref={decorRef} className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-accent-primary/[0.03] rounded-full blur-3xl" />
-                <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-accent-secondary/[0.03] rounded-full blur-3xl" />
+                <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-accent-primary/3 rounded-full blur-3xl" />
+                <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-accent-secondary/3 rounded-full blur-3xl" />
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,var(--color-bg-primary)_70%)]" />
             </div>
 
             <div className="relative container-docs text-center">
-                
+
                 <h1
                     ref={titleRef}
                     className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6 opacity-0"
                 >
-                    Learn. Build.
+                    {currentLang === "hi" ? "Seekho. Banao." : "Learn. Build."}
                     <br />
-                    <span className="gradient-text">Ship Code.</span>
+                    <span className="gradient-text">{currentLang === "hi" ? "Code Ship Karo." : "Ship Code."}</span>
                 </h1>
 
                 <p
                     ref={subtitleRef}
                     className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-10 leading-relaxed opacity-0"
                 >
-                    Curated roadmaps and developer notes across Full Stack, AI/ML, DevOps,
-                    and more. Structured learning paths for modern software engineering.
+                    {currentLang === "hi"
+                        ? "Full Stack, AI/ML, DevOps aur bohut aage ke liye curated roadmaps aur developer notes. Modern software engineering sikhne ke behtareen raastey."
+                        : "Curated roadmaps and developer notes across Full Stack, AI/ML, DevOps, and more. Structured learning paths for modern software engineering."}
                 </p>
 
                 <div ref={searchRef} className="max-w-xl mx-auto mb-12 opacity-0">
@@ -90,7 +94,7 @@ export default function Hero() {
                             <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                             <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                         </svg>
-                        6 Domains
+                        8 {currentLang === "hi" ? "Kshetr (Domains)" : "Domains"}
                     </div>
                     <div className="flex items-center gap-2">
                         <svg
@@ -106,7 +110,7 @@ export default function Hero() {
                             <circle cx="12" cy="12" r="10" />
                             <polyline points="12 6 12 12 16 14" />
                         </svg>
-                        Structured Paths
+                        {currentLang === "hi" ? "Behtareen Raastey" : "Structured Paths"}
                     </div>
                     <div className="flex items-center gap-2">
                         <svg
@@ -122,7 +126,7 @@ export default function Hero() {
                             <polyline points="16 18 22 12 16 6" />
                             <polyline points="8 6 2 12 8 18" />
                         </svg>
-                        Open Source
+                        {currentLang === "hi" ? "Muft (Open Source)" : "Open Source"}
                     </div>
                 </div>
             </div>

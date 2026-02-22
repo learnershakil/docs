@@ -1,0 +1,39 @@
+---
+title: "Rust Ownership Model (Hinglish)"
+description: "Bina garbage collection ke memory safe rakhna."
+---
+
+> **📝 Note:** Yeh ek Hinglish (Hindi + English) anuvaad hai. (This is a Hinglish translation).
+
+# The Rust Ownership Model
+
+Rust ka sabse main feature **ownership** hai, jo Rust ko bina kisi garbage collector ke memory safety ki guarantee dene mein madad karta hai.
+
+## Rules of Ownership
+
+1. Rust mein har value ka ek *owner* hota hai.
+2. Ek time par sirf ek hi owner ho sakta hai.
+3. Jab owner scope se bahaar jata hai, value drop ho jati hai (memory free ho jati hai).
+
+```rust
+fn main() {
+    let s = String::from("hello"); // s scope mein aata hai
+
+    takes_ownership(s);             // s ki value function mein chali jati hai
+                                    // isliye s ab yahan valid nahi hai
+
+    let x = 5;                      // x scope mein aata hai
+    makes_copy(x);                  // x function mein chala jata,
+                                    // lekin i32 'Copy' hai, toh x ko aage use karna theek hai
+}
+
+fn takes_ownership(some_string: String) { // some_string scope mein aata hai
+    println!("{}", some_string);
+} // Yahan, some_string scope se bahar jata hai aur `drop` call hota hai. Memory free ho gai.
+
+fn makes_copy(some_integer: i32) { // some_integer scope mein aata hai
+    println!("{}", some_integer);
+} // Yahan, some_integer scope se bahar jata hai. Kuch special nahi hota.
+```
+
+In rules ko compile time par enforce karke, Rust humein dangling pointers, double-free errors, aur memory leaks se bachata hai.

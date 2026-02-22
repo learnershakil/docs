@@ -1,0 +1,62 @@
+---
+title: \' (Hinglish)\'Mobile Architecture Patterns"
+description: "MVVM, clean architecture, and dependency injection in mobile apps."
+---
+
+> **📝 Note:** Yeh ek Hinglish (Hindi + English) anuvaad hai. (This is a Hinglish translation).
+
+
+# Mobile Architecture Patterns (Hinglish)
+
+Scalable mobile apps require well-defined architecture boundaries. This note covers patterns that work across React Native and Flutter.
+
+## MVVM Pattern
+
+Model-View-ViewModel separates UI from business logic:
+
+```typescript
+// ViewModel
+class TaskViewModel {
+  private tasks: Task[] = [];
+
+  get activeTasks(): Task[] {
+    return this.tasks.filter((t) => !t.completed);
+  }
+
+  get completedCount(): number {
+    return this.tasks.filter((t) => t.completed).length;
+  }
+
+  async loadTasks(): Promise<void> {
+    this.tasks = await this.repository.fetchAll();
+  }
+
+  async toggleTask(id: string): Promise<void> {
+    const task = this.tasks.find((t) => t.id === id);
+    if (task) {
+      task.completed = !task.completed;
+      await this.repository.update(task);
+    }
+  }
+}
+```
+
+## Clean Architecture Layers
+
+```
+┌─────────────────────────┐
+│    Presentation Layer   │  UI Components, ViewModels
+├─────────────────────────┤
+│      Domain Layer       │  Use Cases, Entities, Repository Interfaces
+├─────────────────────────┤
+│       Data Layer        │  Repository Impl, API Clients, Local Storage
+└─────────────────────────┘
+```
+
+> The dependency rule: outer layers depend on inner layers, never the reverse.
+
+## Summary
+
+- MVVM for clear separation of UI and logic
+- Clean architecture for testable, maintainable codebases
+- Dependency injection for loose coupling

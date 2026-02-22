@@ -1,36 +1,37 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useParams } from "next/navigation";
 import { SITE_CONFIG } from "@/lib/constants";
-
-const footerLinks = [
-    {
-        title: "Domains",
-        links: [
-            { label: "Full Stack", href: "/full-stack" },
-            { label: "AI & ML", href: "/ai-ml" },
-            { label: "App Dev", href: "/app-dev" },
-            { label: "Cyber Security", href: "/cyber-security" },
-            { label: "GenAI", href: "/gen-ai" },
-            { label: "DevOps", href: "/devops" },
-        ],
-    },
-    {
-        title: "Resources",
-        links: [
-            { label: "Roadmaps", href: "/#domains" },
-            { label: "Notes", href: "/#domains" },
-            { label: "GitHub", href: SITE_CONFIG.github, external: true },
-        ],
-    },
-];
+import { getDomains } from "@/lib/data";
 
 export default function Footer() {
+    const params = useParams();
+    const currentLang = (params?.lang as string) === "hi" ? "hi" : "en";
+    const localizedDomains = getDomains(currentLang);
+
+    const footerLinks = [
+        {
+            title: currentLang === "hi" ? "Domains (Kshetr)" : "Domains",
+            links: localizedDomains.map(d => ({ label: d.title, href: `/${currentLang}/${d.slug}` })),
+        },
+        {
+            title: currentLang === "hi" ? "Resources (Sansaadhan)" : "Resources",
+            links: [
+                { label: currentLang === "hi" ? "Roadmaps" : "Roadmaps", href: `/${currentLang}#domains` },
+                { label: currentLang === "hi" ? "Notes" : "Notes", href: `/${currentLang}#domains` },
+                { label: "GitHub", href: SITE_CONFIG.github, external: true },
+            ],
+        },
+    ];
+
     return (
         <footer className="border-t border-border-secondary bg-bg-secondary/50">
             <div className="container-docs py-12">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                     <div>
-                        <Link href="/" className="flex items-center gap-2.5 mb-3">
+                        <Link href={`/${currentLang}`} className="flex items-center gap-2.5 mb-3">
                             <Image
                                 src="/brokenn-shell.svg"
                                 alt={`${SITE_CONFIG.name} Logo`}
@@ -43,7 +44,9 @@ export default function Footer() {
                             </span>
                         </Link>
                         <p className="text-sm text-text-tertiary leading-relaxed max-w-xs">
-                            {SITE_CONFIG.description}
+                            {currentLang === "hi"
+                                ? "Open-source educational platform jisme markdown-based roadmaps aur developer notes shaamil hain."
+                                : SITE_CONFIG.description}
                         </p>
                     </div>
 

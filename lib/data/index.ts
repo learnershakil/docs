@@ -1,8 +1,6 @@
-export { domains, getDomainBySlug, getAllDomainSlugs } from "./domains";
-export { roadmaps, getRoadmapByDomain } from "./roadmaps";
+export { domains, getDomains, getDomainBySlug, getAllDomainSlugs } from "./domains";
+export { roadmaps, getRoadmaps, getRoadmapByDomain } from "./roadmaps";
 export {
-    noteTopics,
-    notesMeta,
     getNotesByDomain,
     getTopicsByDomain,
     getNoteBySlug,

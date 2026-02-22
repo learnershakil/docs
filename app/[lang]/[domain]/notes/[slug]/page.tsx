@@ -18,31 +18,37 @@ import type { NoteSidebarItem } from "@/types";
 
 interface PageProps {
     params: Promise<{
+        lang: string;
         domain: string;
         slug: string;
     }>;
 }
 
 export async function generateStaticParams() {
-    const params: { domain: string; slug: string }[] = [];
+    const params: { lang: string; domain: string; slug: string }[] = [];
     const domainSlugs = getAllDomainSlugs();
 
-    domainSlugs.forEach((domainSlug) => {
-        const notes = getNotesByDomain(domainSlug);
-        notes.forEach((note) => {
-            params.push({
-                domain: domainSlug,
-                slug: note.slug,
+    for (const lang of ["en", "hi"]) {
+        domainSlugs.forEach((domainSlug) => {
+            const notes = getNotesByDomain(domainSlug, lang as "en" | "hi");
+            notes.forEach((note) => {
+                params.push({
+                    lang,
+                    domain: domainSlug,
+                    slug: note.slug,
+                });
             });
         });
-    });
+    }
 
     return params;
 }
 
+export const dynamicParams = false;
+
 export async function generateMetadata({ params }: PageProps) {
-    const { domain, slug } = await params;
-    const note = getNoteBySlug(domain, slug);
+    const { lang, domain, slug } = await params;
+    const note = getNoteBySlug(domain, slug, lang as "en" | "hi");
 
     if (!note) return { title: "Not Found" };
 
@@ -53,19 +59,20 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 export default async function NotePage({ params }: PageProps) {
-    const { domain: domainSlug, slug: noteSlug } = await params;
+    const { lang, domain: domainSlug, slug: noteSlug } = await params;
+    const currentLang = lang as "en" | "hi";
 
-    const domainData = getDomainBySlug(domainSlug);
-    const noteMeta = getNoteBySlug(domainSlug, noteSlug);
-    const mdxData = await getNoteContent(domainSlug, noteSlug);
+    const domainData = getDomainBySlug(domainSlug, currentLang);
+    const noteMeta = getNoteBySlug(domainSlug, noteSlug, currentLang);
+    const mdxData = await getNoteContent(domainSlug, noteSlug, currentLang);
 
     if (!domainData || !noteMeta || !mdxData) {
         notFound();
     }
 
     // Build sidebar tree
-    const rawNotes = getNotesByDomain(domainSlug);
-    const topics = getTopicsByDomain(domainSlug);
+    const rawNotes = getNotesByDomain(domainSlug, currentLang);
+    const topics = getTopicsByDomain(domainSlug, currentLang);
     const sidebarItems: NoteSidebarItem[] = topics.map((topic) => ({
         topic,
         notes: rawNotes
@@ -80,13 +87,13 @@ export default async function NotePage({ params }: PageProps) {
                     <NotesSidebar domainSlug={domainSlug} items={sidebarItems} />
 
                     <main className="flex-1 min-w-0 py-8 lg:px-8 bg-bg-primary">
-                        <Breadcrumbs domain={domainData} note={noteMeta} />
+                        <Breadcrumbs domain={domainData} note={noteMeta} lang={currentLang} />
 
                         <article className="prose-docs">
                             <MDXRemote source={mdxData.content} components={mdxComponents} />
                         </article>
 
-                        <GithubEditLink domainSlug={domainSlug} noteSlug={noteSlug} />
+                        <GithubEditLink domainSlug={domainSlug} noteSlug={noteSlug} lang={currentLang} />
                     </main>
 
                     <NotesTOC headings={mdxData.headings} />

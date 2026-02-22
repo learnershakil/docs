@@ -1,3 +1,10 @@
+export type Lang = "en" | "hi";
+
+export interface TranslatableString {
+  en: string;
+  hi: string;
+}
+
 export interface Domain {
   id: string;
   title: string;

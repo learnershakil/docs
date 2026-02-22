@@ -4,13 +4,16 @@ import { GITHUB_CONTENT_BASE } from "@/lib/constants";
 interface GithubEditLinkProps {
     domainSlug: string;
     noteSlug: string;
+    lang: string;
 }
 
 export default function GithubEditLink({
     domainSlug,
     noteSlug,
+    lang,
 }: GithubEditLinkProps) {
-    const editUrl = `${GITHUB_CONTENT_BASE}/${domainSlug}/${noteSlug}.mdx`;
+    const langFolder = lang === "hi" ? "hinglish" : "english";
+    const editUrl = `${GITHUB_CONTENT_BASE}/${langFolder}/${domainSlug}/${noteSlug}.mdx`;
 
     return (
         <div className="mt-16 pt-8 border-t border-border-secondary flex items-center justify-between">
@@ -36,7 +39,7 @@ export default function GithubEditLink({
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                 </svg>
-                Edit this page on GitHub
+                {lang === "hi" ? "GitHub par is page ko edit karein" : "Edit this page on GitHub"}
             </a>
         </div>
     );
