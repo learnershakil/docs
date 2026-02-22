@@ -2,14 +2,17 @@
 
 import { useState, useRef, useEffect } from "react";
 import { gsap } from "gsap";
+import Link from "next/link";
+import RoadmapTimeline from "@/components/RoadmapTimeline";
 import type { Roadmap, NoteSidebarItem } from "@/types";
 
 interface DomainTabsProps {
+    domainSlug: string;
     roadmap?: Roadmap;
     notes: NoteSidebarItem[];
 }
 
-export default function DomainTabs({ roadmap, notes }: DomainTabsProps) {
+export default function DomainTabs({ domainSlug, roadmap, notes }: DomainTabsProps) {
     const [activeTab, setActiveTab] = useState<"roadmaps" | "notes">("roadmaps");
     const indicatorRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -81,15 +84,37 @@ export default function DomainTabs({ roadmap, notes }: DomainTabsProps) {
                 {activeTab === "roadmaps" ? (
                     <div className="text-center text-text-tertiary">
                         {roadmap ? (
-                            <p>Roadmap component will render here</p>
+                            <RoadmapTimeline roadmap={roadmap} />
                         ) : (
                             <p className="mt-12 text-center text-text-tertiary">No roadmaps available.</p>
                         )}
                     </div>
                 ) : (
-                    <div className="text-center text-text-tertiary">
+                    <div className="max-w-4xl mx-auto space-y-12">
                         {notes.length > 0 ? (
-                            <p>Notes component will render here</p>
+                            notes.map((group) => (
+                                <div key={group.topic.id} className="text-left">
+                                    <h3 className="text-xl font-bold text-text-primary mb-4 border-b border-border-secondary pb-2">
+                                        {group.topic.title}
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {group.notes.map((note) => (
+                                            <Link
+                                                key={note.slug}
+                                                href={`/${domainSlug}/notes/${note.slug}`}
+                                                className="card p-5 group hover:-translate-y-1 transition-transform"
+                                            >
+                                                <h4 className="font-semibold text-text-primary group-hover:text-accent-primary transition-colors mb-2">
+                                                    {note.title}
+                                                </h4>
+                                                <p className="text-sm text-text-secondary leading-relaxed line-clamp-2">
+                                                    {note.description}
+                                                </p>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))
                         ) : (
                             <p className="mt-12 text-center text-text-tertiary">No notes available.</p>
                         )}

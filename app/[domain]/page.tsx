@@ -63,7 +63,7 @@ export default async function DomainHubPage({ params }: PageProps) {
     return (
         <PageTransition>
             <DomainHeader domain={domainData} />
-            <DomainTabs roadmap={roadmap} notes={notesTree} />
+            <DomainTabs domainSlug={domainData.slug} roadmap={roadmap} notes={notesTree} />
         </PageTransition>
     );
 }
